@@ -1,0 +1,21 @@
+vpath %.cpp ../src
+vpath %.a ../../deps/hiredis/
+ifdef dbg
+DEBUG:=-DDEBUG -g -ggdb3 -rdynamic
+endif
+
+CXXFLAGS =-std=c++0x -L../../deps/hiredis -lrt -I../inc -I ../../deps/hiredis/ $(DEBUG) 
+SRC = write.cpp
+
+OBJ=$(addsuffix .o, $(basename $(SRC)))
+BIN_DOT_A=$(addsuffix .a, $(basename $(SRC)))
+BIN=$(basename $(SRC))
+
+
+default:$(BIN_DOT_A)
+	ls *.a|xargs -I{} echo '{}' |perl -ne 'chomp;$$i=$$_;s/\..*//g;rename $$i,$$_'
+	#mv -f $(BIN) ../../../bin/
+	rm -fr *.o
+
+%.a:%.o
+	g++ $(CXXFLAGS) -o $@ $^ libhiredis.a 
